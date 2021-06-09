@@ -60,6 +60,8 @@ router.get("/", async (req, res, next) => {
         convoJSON.otherUser = convoJSON.user2;
         delete convoJSON.user2;
       }
+      // reverse the order for showing in frontend
+      convoJSON.messages.reverse();
 
       // set property for online status of the other user
       if (onlineUsers.includes(convoJSON.otherUser.id)) {
