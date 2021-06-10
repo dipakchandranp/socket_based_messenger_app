@@ -2,6 +2,8 @@ const router = require("express").Router();
 const { User } = require("../../db/models");
 const jwt = require("jsonwebtoken");
 
+const TOKEN_EXPIRE_SECONDS = 86400;
+
 router.post("/register", async (req, res, next) => {
   try {
     // expects {username, email, password} in req.body
@@ -24,9 +26,9 @@ router.post("/register", async (req, res, next) => {
     const token = jwt.sign(
       { id: user.dataValues.id },
       process.env.SESSION_SECRET,
-      { expiresIn: 86400 }
+      { expiresIn: TOKEN_EXPIRE_SECONDS }
     );
-    res.cookie("token", token, { httpOnly: true });
+      res.cookie("token", token,  { httpOnly: true, expires: new Date(Date.now() + TOKEN_EXPIRE_SECONDS * 1000) });
     res.json({
       ...user.dataValues,
     });
@@ -62,9 +64,9 @@ router.post("/login", async (req, res, next) => {
       const token = jwt.sign(
         { id: user.dataValues.id },
         process.env.SESSION_SECRET,
-        { expiresIn: 86400 }
+        { expiresIn: TOKEN_EXPIRE_SECONDS }
       );
-      res.cookie("token", token,  { httpOnly: true });
+      res.cookie("token", token,  { httpOnly: true, expires: new Date(Date.now() + TOKEN_EXPIRE_SECONDS * 1000) });
       res.json({
         ...user.dataValues,
       });
@@ -75,7 +77,7 @@ router.post("/login", async (req, res, next) => {
 });
 
 router.delete("/logout", (req, res, next) => {
-  res.cookie("token", '', { maxAge: 0 });
+  res.clearCookie("token");
   res.sendStatus(204);
 });
 
