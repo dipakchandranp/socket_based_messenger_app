@@ -17,8 +17,8 @@ import GreetLayout from "./components/GreetLayout";
 const useStyles = makeStyles((theme) => ({
   forgotPasswordCta: {
     color: theme.palette.primary.main,
-    fontSize: "12px",
-    fontWeight: 600,
+    fontSize: theme.typography.fontSizeSmall,
+    fontWeight: theme.typography.fontWeightBold,
     cursor: "pointer"
   }
 }));
@@ -36,7 +36,7 @@ const Login = (props) => {
     await login({ username, password });
   };
 
-  const handelForgotPassword = () => {
+  const handleForgotPassword = () => {
     console.log("TODO: Implement forgot password");
   }
 
@@ -72,11 +72,13 @@ const Login = (props) => {
               type="password"
               name="password"
               InputProps={{
-                endAdornment: (<InputAdornment position="end" onClick={handelForgotPassword}>
-                    <span className={classes.forgotPasswordCta}>Forgot?</span>
-                </InputAdornment>)
+                endAdornment: (
+                  <InputAdornment position="end" onClick={handleForgotPassword}>
+                      <span className={classes.forgotPasswordCta}>Forgot?</span>
+                  </InputAdornment>
+                )
               }}
-              />
+            />
           </FormControl>
         </Grid>
     </GreetLayout>

@@ -16,7 +16,12 @@ const useStyles = makeStyles((theme) => ({
     height: "100vh",
   },
   bgWithGradient: {
-    backgroundImage: `linear-gradient(to bottom, rgb(58 141 255 / 80%), rgb(134 185 255 / 80%)), url("${bgImage}")`,
+    backgroundImage: `
+      linear-gradient(
+        to bottom, ${theme.palette.gradient.start(80)}, ${theme.palette.gradient.end(80)}
+      ),
+      url("${bgImage}")
+    `,
     backgroundRepeat: "no-repeat",
     backgroundSize: "cover",
     display: "flex", 
@@ -25,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
   bubble: {
     width: "67px",
     height: "67px",
-    marginBottom: "20px"
+    marginBottom: theme.spacing(2)
   },
   introBox: {
     display: "flex", 
@@ -38,14 +43,17 @@ const useStyles = makeStyles((theme) => ({
   },
   actionHelper: {
     color: theme.palette.secondary.main,
-    fontSize: "14px",
-    padding: "16px 0",
+    fontSize: theme.typography.fontSize,
+    paddingTop: theme.spacing(2)
   },
   action: {
     width: "170px",
     height: "54px",
-    margin: "0 0 0 30px",
-    padding: "16px 33px 19px 34px",
+    marginLeft: theme.spacing(4),
+    paddingTop: theme.spacing(4),
+    paddingBottom: theme.spacing(4),
+    paddingLeft: theme.spacing(2),
+    paddingRight: theme.spacing(2),
     borderRadius: "5px",
     boxShadow: "0 2px 12px 0 rgba(74, 106, 149, 0.2)",
     color: theme.palette.primary.main,
@@ -57,7 +65,10 @@ const useStyles = makeStyles((theme) => ({
   submitBtn: {
     width: "160px",
     height: "56px",
-    padding: "18px 55px 18px 56px",
+    paddingTop: theme.spacing(4),
+    paddingBottom: theme.spacing(4),
+    paddingLeft: theme.spacing(2),
+    paddingRight: theme.spacing(2),
     borderRadius: "3px",
     backgroundColor: theme.palette.primary.main,
     color: "white"
@@ -89,7 +100,7 @@ const GreetLayout = (props) => {
           </Box>
       </Grid>
       <Grid item xs={12} md={7} >
-        <Grid container   spacing={0} >
+        <Grid container spacing={0} >
           <Grid item xs={12}>
             <Box p={3}>
               <Grid container justify="flex-end">

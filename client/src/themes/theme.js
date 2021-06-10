@@ -7,6 +7,7 @@ export const theme = createMuiTheme({
   typography: {
     fontFamily: "Open Sans, sans-serif",
     fontSize: 14,
+    fontSizeSmall: 12,
     button: {
       textTransform: "none",
       letterSpacing: 0,
@@ -55,6 +56,10 @@ export const theme = createMuiTheme({
   },
   palette: {
     primary: { main: PRIMARY_COLOR },
-    secondary: { main: SECONDARY_COLOR }
+    secondary: { main: SECONDARY_COLOR },
+    gradient: {
+      start: opacity => `rgb(58 141 255 / ${opacity || 100}%)`, 
+      end: opacity => `rgb(134 185 255 / ${opacity || 100}%)`
+    }
   }
 });
