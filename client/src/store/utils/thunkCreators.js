@@ -1,5 +1,5 @@
 import axios from "axios";
-import socket from "../../socket";
+import establishSocketConnection from "../../socket";
 import {
   gotConversations,
   addConversation,
@@ -8,7 +8,18 @@ import {
 } from "../conversations";
 import { gotUser, setFetchingStatus } from "../user";
 
+let socket;
 // USER THUNK CREATORS
+
+/**
+ * Establishes a socket connection and broad cast
+ * go online event with current user id
+ * @param {String} id
+ */
+const goOnline = id => {
+  socket = establishSocketConnection();
+  socket.emit("go-online", id);
+}
 
 export const fetchUser = () => async (dispatch) => {
   dispatch(setFetchingStatus(true));
@@ -16,7 +27,10 @@ export const fetchUser = () => async (dispatch) => {
     const { data } = await axios.get("/auth/user");
     dispatch(gotUser(data));
     if (data.id) {
-      socket.emit("go-online", data.id);
+      // establish socket connection if not there
+      if(!socket) {
+        goOnline(data.id);
+      }
     }
   } catch (error) {
     console.error(error);
@@ -29,7 +43,8 @@ export const register = (credentials) => async (dispatch) => {
   try {
     const { data } = await axios.post("/auth/register", credentials);
     dispatch(gotUser(data));
-    socket.emit("go-online", data.id);
+    // establish socket connection on registration and go online
+    goOnline(data.id);
   } catch (error) {
     console.error(error);
     dispatch(gotUser({ error: error.response.data.error || "Server Error" }));
@@ -40,7 +55,8 @@ export const login = (credentials) => async (dispatch) => {
   try {
     const { data } = await axios.post("/auth/login", credentials);
     dispatch(gotUser(data));
-    socket.emit("go-online", data.id);
+    // establish socket connection on registration and go online
+    goOnline(data.id);
   } catch (error) {
     console.error(error);
     dispatch(gotUser({ error: error.response.data.error || "Server Error" }));
@@ -52,6 +68,8 @@ export const logout = (id) => async (dispatch) => {
     await axios.delete("/auth/logout");
     dispatch(gotUser({}));
     socket.emit("logout", id);
+    // close socket connection when user logout
+    socket.close();
   } catch (error) {
     console.error(error);
   }
@@ -74,6 +92,8 @@ const saveMessage = async (body) => {
 };
 
 const sendMessage = (data, body) => {
+  // Make sure a socket connection exist before emitting socket event
+  if(!socket) socket = establishSocketConnection();
   socket.emit("new-message", {
     message: data.message,
     recipientId: body.recipientId,
