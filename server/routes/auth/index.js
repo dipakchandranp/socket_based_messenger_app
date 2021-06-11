@@ -2,6 +2,8 @@ const router = require("express").Router();
 const { User } = require("../../db/models");
 const jwt = require("jsonwebtoken");
 
+const TOKEN_EXPIRE_SECONDS = 86400;
+
 router.post("/register", async (req, res, next) => {
   try {
     // expects {username, email, password} in req.body
@@ -24,11 +26,11 @@ router.post("/register", async (req, res, next) => {
     const token = jwt.sign(
       { id: user.dataValues.id },
       process.env.SESSION_SECRET,
-      { expiresIn: 86400 }
+      { expiresIn: TOKEN_EXPIRE_SECONDS }
     );
+      res.cookie("token", token,  { httpOnly: true, expires: new Date(Date.now() + TOKEN_EXPIRE_SECONDS * 1000) });
     res.json({
       ...user.dataValues,
-      token,
     });
   } catch (error) {
     if (error.name === "SequelizeUniqueConstraintError") {
@@ -62,11 +64,11 @@ router.post("/login", async (req, res, next) => {
       const token = jwt.sign(
         { id: user.dataValues.id },
         process.env.SESSION_SECRET,
-        { expiresIn: 86400 }
+        { expiresIn: TOKEN_EXPIRE_SECONDS }
       );
+      res.cookie("token", token,  { httpOnly: true, expires: new Date(Date.now() + TOKEN_EXPIRE_SECONDS * 1000) });
       res.json({
         ...user.dataValues,
-        token,
       });
     }
   } catch (error) {
@@ -75,10 +77,13 @@ router.post("/login", async (req, res, next) => {
 });
 
 router.delete("/logout", (req, res, next) => {
+  res.clearCookie("token");
   res.sendStatus(204);
 });
 
 router.get("/user", (req, res, next) => {
+  // Set csrf token in initial request
+  res.cookie('XSRF-TOKEN', req.csrfToken());
   if (req.user) {
     return res.json(req.user);
   } else {
