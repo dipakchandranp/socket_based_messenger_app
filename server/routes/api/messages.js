@@ -16,11 +16,17 @@ router.post("/", async (req, res, next) => {
       senderId,
       recipientId
     );
-
     // if we already know conversation id, find the conversion by senderId and recipientId
     // and make sure conversationId matches. Then add it to message and return
     if (conversationId) {
+      const convJson = conversation.toJSON();
       if(conversation && conversation.id == conversationId) {
+        // if last message is by current user, increment count, else set count to one
+        let newUnreadCount = 1;
+        if(convJson.messages[0].senderId == senderId) {
+          newUnreadCount = conversation.unreadCount + 1; // increase unread count
+        }
+        await conversation.update({ unreadCount: newUnreadCount}); // increase unread count
         const message = await Message.create({ senderId, text, conversationId });
         return res.json({ message, sender });
       } 
@@ -33,6 +39,7 @@ router.post("/", async (req, res, next) => {
       conversation = await Conversation.create({
         user1Id: senderId,
         user2Id: recipientId,
+        unreadCount: 1
       });
       if (sender && onlineUsers.includes(sender.id)) {
         sender.online = true;

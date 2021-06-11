@@ -19,7 +19,7 @@ router.get("/", async (req, res, next) => {
           user2Id: userId,
         },
       },
-      attributes: ["id"],
+      attributes: ["id", "unreadCount"],
       order: [[Message, "createdAt", "DESC"]],
       include: [
         { model: Message, order: ["createdAt", "DESC"] },
@@ -80,5 +80,49 @@ router.get("/", async (req, res, next) => {
     next(error);
   }
 });
+
+router.post("/read-all",  async (req, res, next) => {
+  try {
+    if (!req.user) {
+      return res.sendStatus(401);
+    }
+    const senderId = req.user.id;
+    const { conversationId } = req.body;
+    // find conversation by given id, with last message
+    
+    const conversation = await Conversation.findOne({
+      where: { id: conversationId },
+      attributes: ["id", "unreadCount"],
+      order: [[Message, "createdAt", "DESC"]],
+      include: [
+        { // TODO limit messages by 1, last added
+          model: Message,
+          order: ["createdAt", "DESC"],
+        },
+        {
+          model: User,
+          as: "user1",
+          attributes: ["id", "username"]
+        },
+        {
+          model: User,
+          as: "user2",
+          attributes: ["id", "username"]
+        },
+      ],
+    })
+    const conv = conversation.toJSON();
+    // verify current user is part of conversation & current user is not sender of last message 
+    if((conv.user1.id == senderId ||conv.user2.id == senderId) && (conv.messages[0].senderId != senderId)) {
+      // set conversation unread count to zero
+      await conversation.update({ unreadCount: 0 });
+      return res.send({ status: 'updated' })
+    }
+    // invalid access to set unread count
+    return res.status(401).json({ error: "Cannot remove unread message count." });
+  } catch (error) {
+    next(error)
+  }
+})
 
 module.exports = router;

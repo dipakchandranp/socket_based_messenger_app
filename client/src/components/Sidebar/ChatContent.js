@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography } from "@material-ui/core";
+import { Box, Typography, Badge } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
@@ -7,6 +7,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     justifyContent: "space-between",
     marginLeft: 20,
+    marginRight: 20,
     flexGrow: 1,
   },
   username: {
@@ -38,7 +39,10 @@ const ChatContent = (props) => {
   const classes = useStyles();
 
   const { conversation } = props;
-  const { latestMessageText, otherUser } = conversation;
+  const { latestMessageText, otherUser, unreadCount } = conversation;
+  // Show badge with count: if there is unread count, and last message is by other user and its not active chat
+  const showUnreadCount = unreadCount > 0 && props.isLastMessageByOtherUser && !props.activeChat;
+
 
   return (
     <Box className={classes.root}>
@@ -50,6 +54,18 @@ const ChatContent = (props) => {
           {latestMessageText}
         </Typography>
       </Box>
+      {showUnreadCount && (
+        <Box className={classes.unreadCount} px={3}>
+          <Badge
+            badgeContent={unreadCount}
+            color="primary"
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'left',
+            }}
+          />
+        </Box>
+      )}
     </Box>
   );
 };
