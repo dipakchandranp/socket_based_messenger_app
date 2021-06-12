@@ -5,6 +5,7 @@ import {
   addConversation,
   setNewMessage,
   setSearchedUsers,
+  clearNewMessageCount
 } from "../conversations";
 import { gotUser, setFetchingStatus } from "../user";
 
@@ -124,6 +125,17 @@ export const searchUsers = (searchTerm) => async (dispatch) => {
     const { data } = await axios.get(`/api/users/${searchTerm}`);
     dispatch(setSearchedUsers(data));
   } catch (error) {
+    console.error(error);
+  }
+};
+
+
+export const clearConversationUnreadCount = (conversation) => async (dispatch) => {
+  try {
+    await axios.post("/api/conversations/read-all", { conversationId: conversation.id });
+    dispatch(clearNewMessageCount(conversation));
+  } catch (error) {
+    dispatch(clearNewMessageCount(conversation));
     console.error(error);
   }
 };

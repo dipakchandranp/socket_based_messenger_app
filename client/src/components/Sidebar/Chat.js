@@ -3,6 +3,7 @@ import { Box } from "@material-ui/core";
 import { BadgeAvatar, ChatContent } from "../Sidebar";
 import { withStyles } from "@material-ui/core/styles";
 import { setActiveChat } from "../../store/activeConversation";
+import { clearConversationUnreadCount } from "../../store/utils/thunkCreators";
 import { connect } from "react-redux";
 
 const styles = {
@@ -20,16 +21,21 @@ const styles = {
 };
 
 class Chat extends Component {
-  handleClick = async (conversation) => {
-    await this.props.setActiveChat(conversation.otherUser.username);
+  handleClick = async (conversation, clearUnreadCount) => {
+    await this.props.setActiveChat(conversation, clearUnreadCount);
   };
 
+  
   render() {
+    const { conversation } = this.props;
     const { classes } = this.props;
-    const otherUser = this.props.conversation.otherUser;
+    const { otherUser } = conversation;
+    const lastMessage = conversation.messages[conversation.messages.length - 1];
+    const activeChat = otherUser.username === this.props.activeConversation;
+    const isLastMessageByOtherUser = lastMessage ? otherUser.id === lastMessage.senderId : false;
     return (
       <Box
-        onClick={() => this.handleClick(this.props.conversation)}
+        onClick={() => this.handleClick(this.props.conversation, isLastMessageByOtherUser)}
         className={classes.root}
       >
         <BadgeAvatar
@@ -38,7 +44,7 @@ class Chat extends Component {
           online={otherUser.online}
           sidebar={true}
         />
-        <ChatContent conversation={this.props.conversation} />
+        <ChatContent conversation={this.props.conversation} isLastMessageByOtherUser={isLastMessageByOtherUser} activeChat={activeChat}/>
       </Box>
     );
   }
@@ -46,10 +52,19 @@ class Chat extends Component {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    setActiveChat: (id) => {
-      dispatch(setActiveChat(id));
+    setActiveChat: (conversation, clearUnreadCount) => {
+      dispatch(setActiveChat(conversation.otherUser.username));
+      if(clearUnreadCount) {
+        dispatch(clearConversationUnreadCount(conversation));
+      }
     },
   };
 };
 
-export default connect(null, mapDispatchToProps)(withStyles(styles)(Chat));
+const mapStateToProps = (state) => {
+  return {
+    activeConversation: state.activeConversation
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(Chat));
