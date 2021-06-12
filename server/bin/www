@@ -41,7 +41,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("new-message", (data) => {
-    socket.broadcast.emit("new-message", {
+    socket.broadcast.emit(`new-message-${data.recipientId}`, {
       message: data.message,
       sender: data.sender,
     });

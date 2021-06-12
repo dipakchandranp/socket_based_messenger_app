@@ -17,7 +17,7 @@ let socket;
  * @param {String} id
  */
 const goOnline = id => {
-  socket = establishSocketConnection();
+  socket = establishSocketConnection(id);
   socket.emit("go-online", id);
 }
 

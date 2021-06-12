@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography } from "@material-ui/core";
+import { Box, Typography, Badge } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
@@ -50,6 +50,16 @@ const ChatContent = (props) => {
           {latestMessageText}
         </Typography>
       </Box>
+        <Box px={3}>
+          <Badge
+            badgeContent={1822}
+            color="primary"
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'left',
+            }}
+          />
+        </Box>
     </Box>
   );
 };
