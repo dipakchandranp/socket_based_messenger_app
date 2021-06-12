@@ -19,7 +19,7 @@ export const theme = createMuiTheme({
       input: {
         fontWeight: "bold",
         fontSize: "14px",
-        paddingLeft: "5px",
+        paddingLeft: "5px"
       },
       underline: {
         '&:before': {

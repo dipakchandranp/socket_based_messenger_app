@@ -8,12 +8,15 @@ const styles = {
   root: {
     justifySelf: "flex-end",
     marginTop: 15,
+    position: "fixed",
+    bottom: 0,
+    width: "100%",
+    backgroundColor: "white"
   },
   input: {
     height: 70,
     backgroundColor: "#F4F6FA",
-    borderRadius: 8,
-    marginBottom: 20,
+    borderRadius: 8
   },
 };
 
@@ -52,7 +55,7 @@ class Input extends Component {
       <form className={classes.root} onSubmit={this.handleSubmit}>
         <FormControl fullWidth hiddenLabel>
           <FilledInput
-            classes={{ root: classes.input }}
+            // classes={{ root: classes.input }}
             disableUnderline
             placeholder="Type something..."
             value={this.state.text}

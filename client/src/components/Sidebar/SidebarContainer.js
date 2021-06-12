@@ -1,10 +1,31 @@
 import React, { useState } from "react";
 import { connect } from "react-redux";
+import { Drawer } from "@material-ui/core";
+import { makeStyles } from '@material-ui/core/styles';
+
 import { Sidebar } from "./index";
 import { searchUsers } from "../../store/utils/thunkCreators";
 import { clearSearchedUsers } from "../../store/conversations";
 
+
+const drawerWidth = 300;
+
+const useStyles = makeStyles((theme) => ({
+  drawer: {
+    width: drawerWidth,
+    flexShrink: 0,
+  },
+  drawerPaper: {
+    width: drawerWidth,
+    borderRight: 'none',
+    background: "#fafafa"
+  },
+
+}));
+
+
 const SidebarContainer = (props) => {
+  const classes = useStyles();
   const { searchUsers, clearSearchedUsers } = props;
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,7 +46,24 @@ const SidebarContainer = (props) => {
     setSearchTerm(event.target.value);
   };
 
-  return <Sidebar handleChange={handleChange} searchTerm={searchTerm} />;
+  return (
+    <Drawer
+        className={classes.drawer}
+        variant="permanent"
+        classes={{
+          paper: classes.drawerPaper,
+        }}
+        anchor="left"
+      >
+      <Sidebar handleChange={handleChange} searchTerm={searchTerm} />
+    </Drawer>
+  );
+};
+
+const mapStateToProps = (state) => {
+  return {
+    user: state.user
+  };
 };
 
 const mapDispatchToProps = (dispatch) => {
@@ -39,4 +77,7 @@ const mapDispatchToProps = (dispatch) => {
   };
 };
 
-export default connect(null, mapDispatchToProps)(SidebarContainer);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(SidebarContainer);
